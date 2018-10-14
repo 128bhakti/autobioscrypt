@@ -59,7 +59,7 @@ app.post('/login',function(req,res){
 
   var AutobioContract = web3.eth.contract(JSON.parse('[ { "constant": false, "inputs": [ { "name": "_content", "type": "string" }, { "name": "_userid", "type": "string" } ], "name": "setInstructor", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "getInstructor", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" } ]'));
 
-  Autobio = AutobioContract.at('0xe34b8190b8df422f854e1f998afe8faf01ad7ac9');
+  Autobio = AutobioContract.at('0x399014358a08270496ddb5e6189a2a788e93d1e3');
 
   
 
@@ -149,6 +149,135 @@ app.post('/login',function(req,res){
 
   });
 });
+
+app.post('/browse',function(req,res){
+		connection.query('Select bookname,bookid from book_details ',
+  			function(error, results, fields) {
+				  if (error) {
+				    console.log("error ocurred",error);
+				    res.send({
+				      "code":400,
+				      "failed":"error ocurred"
+				    })
+ 				 }
+ 				 else
+ 				 {
+ 				 			var name = JSON.stringify(results);
+					  		res.render(__dirname+'/views/browse',{bname:name});
+
+ 				 }
+
+ 			});
+
+
+});
+
+
+app.post('/continue_browsing',function(req,res){
+	 bookid=req.body.bookid;
+	 connection.query('SELECT chaptername,chapterid FROM chapter_details where bookid=?',[bookid],
+		   function(err, results,fields){
+		    if(err){
+		    	console.log(err);
+
+		    	res.send({
+			      "code":400,
+			      "failed":"error ocurred"
+			    })
+		    }
+		    else{
+
+		    		
+
+		    				console.log(results);
+					   		var chapter_name = JSON.stringify(results);
+					  		res.render(__dirname+'/views/continue_browsing_chp',{chpname:chapter_name});
+		    			
+
+		    		
+
+
+		    }
+
+
+		});
+
+
+});
+
+app.post('/continue_browsing_page',function(req,res){
+	
+		chapterid=req.body.chapterid;
+		connection.query('SELECT page_no,pageid FROM page_details where chapterid=?',[chapterid],
+		   function(err, results,fields){
+		    if(err){
+		    	console.log(err);
+
+		    	res.send({
+			      "code":400,
+			      "failed":"error ocurred"
+			    })
+		    }
+		    else{
+
+		    		
+
+		    				console.log(results);
+					   		var page_name = JSON.stringify(results);
+					  		res.render(__dirname+'/views/continue_browsing_page',{pagename:page_name});
+		    			
+
+		    		
+
+
+		    }
+
+
+		});
+
+
+
+
+
+});
+
+app.post('/page_show',function(req,res){
+	
+	pageid=req.body.pageid;
+	connection.query('SELECT pagecontent,pageid FROM page_details where pageid=?',[pageid],
+		   function(err, results,fields){
+		    if(err){
+		    	console.log(err);
+
+		    	res.send({
+			      "code":400,
+			      "failed":"error ocurred"
+			    })
+		    }
+		    else{
+
+		    		
+
+		    				console.log(results);
+					   		var page_content = JSON.stringify(results);
+					  		res.render(__dirname+'/views/content_display',{pagename:page_content});
+		    			
+
+		    		
+
+
+		    }
+
+
+		});
+
+
+
+
+
+
+});
+
 
 app.post('/link_to_book_details',function(req,res){
 	res.sendfile("book_details.html");
